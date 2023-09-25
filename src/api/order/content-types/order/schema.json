@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Заказы",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "total_price": {
+      "type": "integer"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "payment_method": {
+      "type": "string"
+    },
+    "shipping_address": {
+      "type": "string"
+    },
+    "details": {
+      "type": "string"
+    },
+    "orderNumber": {
+      "type": "integer"
+    },
+    "order_date": {
+      "type": "time"
+    }
+  }
+}

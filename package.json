@@ -1,0 +1,30 @@
+{
+  "name": "kinza-admin-v-2",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A Strapi application",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/plugin-i18n": "4.13.7",
+    "@strapi/plugin-users-permissions": "4.13.7",
+    "@strapi/strapi": "4.13.7",
+    "pg": "8.8.0",
+    "strapi-blurhash": "^1.1.1"
+  },
+  "author": {
+    "name": "A Strapi developer"
+  },
+  "strapi": {
+    "uuid": "e0cc4046-a3a2-4490-938b-eaf8001d29bc"
+  },
+  "engines": {
+    "node": ">=16.0.0 <=20.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
