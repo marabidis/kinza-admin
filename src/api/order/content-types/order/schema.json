@@ -31,7 +31,7 @@
       "type": "integer"
     },
     "order_date": {
-      "type": "time"
+      "type": "datetime"
     }
   }
 }

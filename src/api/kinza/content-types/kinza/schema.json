@@ -24,18 +24,36 @@
     "description_item": {
       "type": "string"
     },
-    "imageUrl": {
-      "type": "string"
-    },
     "price": {
       "type": "integer"
-    },
-    "weight": {
-      "type": "string"
     },
     "blurHash": {
       "type": "string",
       "default": "UAHKUu~q17xbsq%1nOIA16R58wIAxu-;%1Rk"
+    },
+    "ImageUrl": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "isWeightBased": {
+      "type": "boolean",
+      "default": false
+    },
+    "minimumWeight": {
+      "type": "decimal"
+    },
+    "weight": {
+      "type": "decimal"
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category.category",
+      "mappedBy": "products"
     }
   }
 }
