@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "deliveries",
+  "info": {
+    "singularName": "delivery",
+    "pluralName": "deliveries",
+    "displayName": "Доставка",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "delivery": {
+      "type": "integer"
+    },
+    "title": {
+      "type": "string"
+    }
+  }
+}

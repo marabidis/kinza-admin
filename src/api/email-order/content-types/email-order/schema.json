@@ -1,0 +1,19 @@
+{
+  "kind": "singleType",
+  "collectionName": "email_orders",
+  "info": {
+    "singularName": "email-order",
+    "pluralName": "email-orders",
+    "displayName": "Почта для заказа",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email_order": {
+      "type": "email"
+    }
+  }
+}
