@@ -15,4 +15,4 @@ ENV NODE_ENV development
 
 EXPOSE 1337
 
-CMD ["npm", "develop"]
+CMD ["npm", "run", "develop"]
