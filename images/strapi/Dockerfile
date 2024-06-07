@@ -11,7 +11,7 @@ COPY . .
 
 ENV NODE_ENV production
 
-RUN npm run build
+RUN npm run develop
 
 EXPOSE 1337
 
