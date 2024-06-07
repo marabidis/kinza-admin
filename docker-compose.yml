@@ -12,11 +12,15 @@ services:
     restart: always
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n:latest
+    image: docker.n8n.io/n8nio/n8n
     restart: always
     env_file:
       - .env
     ports:
       - "5678:5678"
     volumes:
-      - "~/.n8n:/home/node/.n8n"
+      - n8n_storage:/home/node/.n8n
+    
+
+volumes:
+  n8n_storage:
