@@ -12,7 +12,7 @@ services:
     restart: always
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n
+    image: marabidis/n8n
     restart: always
     env_file:
       - .env
