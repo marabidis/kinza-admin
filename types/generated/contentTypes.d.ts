@@ -23,6 +23,7 @@ export interface AdminPermission extends Schema.CollectionType {
       Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
+    actionParameters: Attribute.JSON & Attribute.DefaultTo<{}>;
     subject: Attribute.String &
       Attribute.SetMinMaxLength<{
         minLength: 1;
@@ -677,6 +678,105 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiCategoryCategory extends Schema.CollectionType {
+  collectionName: 'categories';
+  info: {
+    singularName: 'category';
+    pluralName: 'categories';
+    displayName: '\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    slug: Attribute.UID<'api::category.category', 'title'> & Attribute.Required;
+    products: Attribute.Relation<
+      'api::category.category',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::category.category',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::category.category',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiDeliveryDelivery extends Schema.CollectionType {
+  collectionName: 'deliveries';
+  info: {
+    singularName: 'delivery';
+    pluralName: 'deliveries';
+    displayName: '\u0414\u043E\u0441\u0442\u0430\u0432\u043A\u0430';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    delivery: Attribute.Integer;
+    title: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::delivery.delivery',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::delivery.delivery',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEmailOrderEmailOrder extends Schema.SingleType {
+  collectionName: 'email_orders';
+  info: {
+    singularName: 'email-order';
+    pluralName: 'email-orders';
+    displayName: '\u041F\u043E\u0447\u0442\u0430 \u0434\u043B\u044F \u0437\u0430\u043A\u0430\u0437\u0430';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    email_order: Attribute.Email;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::email-order.email-order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::email-order.email-order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiKinzaKinza extends Schema.CollectionType {
   collectionName: 'kinzas';
   info: {
@@ -693,11 +793,18 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     category: Attribute.String;
     name_item: Attribute.String;
     description_item: Attribute.String;
-    imageUrl: Attribute.String;
     price: Attribute.Integer;
-    weight: Attribute.String;
     blurHash: Attribute.String &
       Attribute.DefaultTo<'UAHKUu~q17xbsq%1nOIA16R58wIAxu-;%1Rk'>;
+    ImageUrl: Attribute.Media;
+    isWeightBased: Attribute.Boolean & Attribute.DefaultTo<false>;
+    minimumWeight: Attribute.Decimal;
+    weight: Attribute.Decimal;
+    categories: Attribute.Relation<
+      'api::kinza.kinza',
+      'manyToMany',
+      'api::category.category'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -732,9 +839,9 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     phone: Attribute.String;
     payment_method: Attribute.String;
     shipping_address: Attribute.String;
-    details: Attribute.String;
+    details: Attribute.Text;
     orderNumber: Attribute.Integer;
-    order_date: Attribute.Time;
+    order_date: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -753,7 +860,7 @@ export interface ApiOrderOrder extends Schema.CollectionType {
   };
 }
 
-declare module '@strapi/strapi' {
+declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
       'admin::permission': AdminPermission;
@@ -769,6 +876,9 @@ declare module '@strapi/strapi' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::category.category': ApiCategoryCategory;
+      'api::delivery.delivery': ApiDeliveryDelivery;
+      'api::email-order.email-order': ApiEmailOrderEmailOrder;
       'api::kinza.kinza': ApiKinzaKinza;
       'api::order.order': ApiOrderOrder;
     }

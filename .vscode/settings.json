@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "kinza",
+            "username": "postgres.yxsrcgwplogjoecppegy",
+            "connectString": "postgres://postgres.yxsrcgwplogjoecppegy:bd7SeQOqK1TYfSuk@aws-0-eu-west-2.pooler.supabase.com:6543/postgres"
+        }
+    ]
+}
