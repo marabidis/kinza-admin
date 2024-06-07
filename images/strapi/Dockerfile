@@ -9,10 +9,10 @@ RUN npm install
 
 COPY . .
 
-ENV NODE_ENV production
+ENV NODE_ENV development
 
-RUN npm run develop
+# RUN npm run develop
 
 EXPOSE 1337
 
-CMD ["npm", "start"]
+CMD ["npm", "develop"]
