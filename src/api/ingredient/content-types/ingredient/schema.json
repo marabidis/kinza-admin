@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ingredients",
+  "info": {
+    "singularName": "ingredient",
+    "pluralName": "ingredients",
+    "displayName": "Ingredient"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "ingredient_options": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::ingredient-option.ingredient-option",
+      "mappedBy": "ingredients"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "kinzas": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::kinza.kinza",
+      "mappedBy": "ingredients"
+    }
+  }
+}

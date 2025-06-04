@@ -777,13 +777,100 @@ export interface ApiEmailOrderEmailOrder extends Schema.SingleType {
   };
 }
 
+export interface ApiIngredientIngredient extends Schema.CollectionType {
+  collectionName: 'ingredients';
+  info: {
+    singularName: 'ingredient';
+    pluralName: 'ingredients';
+    displayName: 'Ingredient';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Required;
+    ingredient_options: Attribute.Relation<
+      'api::ingredient.ingredient',
+      'manyToMany',
+      'api::ingredient-option.ingredient-option'
+    >;
+    photo: Attribute.Media;
+    kinzas: Attribute.Relation<
+      'api::ingredient.ingredient',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::ingredient.ingredient',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::ingredient.ingredient',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiIngredientOptionIngredientOption
+  extends Schema.CollectionType {
+  collectionName: 'ingredient_options';
+  info: {
+    singularName: 'ingredient-option';
+    pluralName: 'ingredient-options';
+    displayName: 'ingredient_option';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    canRemove: Attribute.Boolean & Attribute.DefaultTo<false>;
+    canAdd: Attribute.Boolean & Attribute.DefaultTo<false>;
+    canDouble: Attribute.Boolean & Attribute.DefaultTo<false>;
+    default: Attribute.Boolean & Attribute.DefaultTo<true>;
+    addPrice: Attribute.Decimal & Attribute.DefaultTo<0>;
+    doublePrice: Attribute.Decimal & Attribute.DefaultTo<0>;
+    ingredients: Attribute.Relation<
+      'api::ingredient-option.ingredient-option',
+      'manyToMany',
+      'api::ingredient.ingredient'
+    >;
+    kinzas: Attribute.Relation<
+      'api::ingredient-option.ingredient-option',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::ingredient-option.ingredient-option',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::ingredient-option.ingredient-option',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiKinzaKinza extends Schema.CollectionType {
   collectionName: 'kinzas';
   info: {
     singularName: 'kinza';
     pluralName: 'kinzas';
     displayName: '\u041A\u0430\u0442\u0430\u043B\u043E\u0433';
-    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -794,8 +881,7 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     name_item: Attribute.String;
     description_item: Attribute.String;
     price: Attribute.Integer;
-    blurHash: Attribute.String &
-      Attribute.DefaultTo<'UAHKUu~q17xbsq%1nOIA16R58wIAxu-;%1Rk'>;
+    blurHash: Attribute.String & Attribute.DefaultTo<'\u2026'>;
     ImageUrl: Attribute.Media;
     isWeightBased: Attribute.Boolean & Attribute.DefaultTo<false>;
     minimumWeight: Attribute.Decimal;
@@ -804,6 +890,16 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
       'api::kinza.kinza',
       'manyToMany',
       'api::category.category'
+    >;
+    ingredients: Attribute.Relation<
+      'api::kinza.kinza',
+      'manyToMany',
+      'api::ingredient.ingredient'
+    >;
+    ingredient_options: Attribute.Relation<
+      'api::kinza.kinza',
+      'manyToMany',
+      'api::ingredient-option.ingredient-option'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -879,6 +975,8 @@ declare module '@strapi/types' {
       'api::category.category': ApiCategoryCategory;
       'api::delivery.delivery': ApiDeliveryDelivery;
       'api::email-order.email-order': ApiEmailOrderEmailOrder;
+      'api::ingredient.ingredient': ApiIngredientIngredient;
+      'api::ingredient-option.ingredient-option': ApiIngredientOptionIngredientOption;
       'api::kinza.kinza': ApiKinzaKinza;
       'api::order.order': ApiOrderOrder;
     }
