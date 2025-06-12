@@ -4,7 +4,7 @@
   "info": {
     "singularName": "ingredient-option",
     "pluralName": "ingredient-options",
-    "displayName": "ingredient_option",
+    "displayName": "Ingredient_option",
     "description": ""
   },
   "options": {
@@ -14,39 +14,43 @@
   "attributes": {
     "canRemove": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "required": false
     },
     "canAdd": {
       "type": "boolean",
-      "default": false
+      "default": true,
+      "required": false
     },
     "canDouble": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "required": false
     },
     "default": {
       "type": "boolean",
-      "default": true
+      "default": false,
+      "required": false
     },
     "addPrice": {
-      "type": "decimal",
+      "type": "integer",
       "default": 0
     },
     "doublePrice": {
-      "type": "decimal",
+      "type": "integer",
       "default": 0
     },
-    "ingredients": {
+    "ingredient": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToOne",
       "target": "api::ingredient.ingredient",
-      "inversedBy": "ingredient_options"
+      "inversedBy": "ingredient_option"
     },
-    "kinzas": {
+    "katalogs": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::kinza.kinza",
-      "mappedBy": "ingredient_options"
+      "inversedBy": "ingredient_options"
     }
   }
 }

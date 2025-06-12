@@ -4,7 +4,8 @@
   "info": {
     "singularName": "kinza",
     "pluralName": "kinzas",
-    "displayName": "Каталог"
+    "displayName": "Каталог",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -33,6 +34,7 @@
     "ImageUrl": {
       "type": "media",
       "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images"
       ]
@@ -53,17 +55,20 @@
       "target": "api::category.category",
       "mappedBy": "products"
     },
-    "ingredients": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::ingredient.ingredient",
-      "inversedBy": "kinzas"
-    },
     "ingredient_options": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::ingredient-option.ingredient-option",
-      "inversedBy": "kinzas"
+      "mappedBy": "katalogs"
+    },
+    "ingredients": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::ingredient.ingredient",
+      "inversedBy": "katalogs"
+    },
+    "discountPrice": {
+      "type": "integer"
     }
   }
 }

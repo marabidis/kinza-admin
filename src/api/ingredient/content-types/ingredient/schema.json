@@ -4,7 +4,8 @@
   "info": {
     "singularName": "ingredient",
     "pluralName": "ingredients",
-    "displayName": "Ingredient"
+    "displayName": "Ingredient",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -12,27 +13,27 @@
   "pluginOptions": {},
   "attributes": {
     "name": {
-      "type": "string",
-      "required": true
-    },
-    "ingredient_options": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::ingredient-option.ingredient-option",
-      "mappedBy": "ingredients"
+      "type": "string"
     },
     "photo": {
       "type": "media",
       "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images"
       ]
     },
-    "kinzas": {
+    "katalogs": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::kinza.kinza",
       "mappedBy": "ingredients"
+    },
+    "ingredient_option": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::ingredient-option.ingredient-option",
+      "mappedBy": "ingredient"
     }
   }
 }
