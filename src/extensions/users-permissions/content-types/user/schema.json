@@ -1,0 +1,32 @@
+{
+  "collectionName": "users",
+  "info": {
+    "singularName": "user",
+    "pluralName": "users",
+    "displayName": "user"
+  },
+  "options": {
+    "draftAndPublish": false,
+    "timestamps": true
+  },
+  "attributes": {
+    "username": { "type": "string", "minLength": 3, "unique": true, "required": true },
+    "email": { "type": "email", "minLength": 6, "maxLength": 254, "unique": true, "required": true },
+    "provider": { "type": "string" },
+    "password": { "type": "password", "minLength": 6, "private": true },
+    "resetPasswordToken": { "type": "string", "private": true },
+    "confirmationToken": { "type": "string", "private": true },
+    "confirmed": { "type": "boolean", "default": false },
+    "blocked": { "type": "boolean", "default": false },
+    "role": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.role"
+    },
+    "phone": {
+      "type": "string",
+      "unique": true,
+      "regex": "^(\\+?[0-9]{10,15})$"
+    }
+  }
+}
