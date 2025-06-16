@@ -15,8 +15,8 @@ export default ({ env }) => ({
       },
     },
   },
-  sms: {
-    enabled: true,
-    resolve: './src/plugins/sms',
-  },
+sms: {
+  enabled: true,
+  resolve: 'plugins/sms',
+},
 });

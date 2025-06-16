@@ -643,6 +643,38 @@ export interface ApiOrderOrder extends Schema.CollectionType {
   };
 }
 
+export interface ApiOtpCodeOtpCode extends Schema.CollectionType {
+  collectionName: 'otp_codes';
+  info: {
+    displayName: 'OTP Code';
+    pluralName: 'otp-codes';
+    singularName: 'otp-code';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    code: Attribute.String;
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::otp-code.otp-code',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    expires: Attribute.DateTime;
+    phone: Attribute.String;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::otp-code.otp-code',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    used: Attribute.Boolean & Attribute.DefaultTo<false>;
+  };
+}
+
 export interface ApiTestTest extends Schema.CollectionType {
   collectionName: 'tests';
   info: {
@@ -1036,11 +1068,9 @@ export interface PluginUsersPermissionsRole extends Schema.CollectionType {
 }
 
 export interface PluginUsersPermissionsUser extends Schema.CollectionType {
-  collectionName: 'up_users';
+  collectionName: 'users';
   info: {
-    description: '';
-    displayName: 'User';
-    name: 'user';
+    displayName: 'user';
     pluralName: 'users';
     singularName: 'user';
   };
@@ -1061,7 +1091,9 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       Attribute.Private;
     email: Attribute.Email &
       Attribute.Required &
+      Attribute.Unique &
       Attribute.SetMinMaxLength<{
+        maxLength: 254;
         minLength: 6;
       }>;
     password: Attribute.Password &
@@ -1069,6 +1101,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    phone: Attribute.String & Attribute.Unique;
     provider: Attribute.String;
     resetPasswordToken: Attribute.String & Attribute.Private;
     role: Attribute.Relation<
@@ -1109,6 +1142,7 @@ declare module '@strapi/types' {
       'api::ingredient.ingredient': ApiIngredientIngredient;
       'api::kinza.kinza': ApiKinzaKinza;
       'api::order.order': ApiOrderOrder;
+      'api::otp-code.otp-code': ApiOtpCodeOtpCode;
       'api::test.test': ApiTestTest;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

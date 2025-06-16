@@ -1,0 +1,7 @@
+{
+  "name": "sms",
+  "version": "0.0.1",
+  "strapi": { "kind": "plugin" },
+  "main": "strapi-server.js"
+}
+

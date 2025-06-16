@@ -6,7 +6,8 @@
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
-    "build": "strapi build -d",
+    "build": "strapi build -d && npm run copy-plugin-files",
+    "copy-plugin-files": "cp -R plugins/sms/package.json dist/plugins/sms/package.json",
     "strapi": "strapi"
   },
   "dependencies": {
