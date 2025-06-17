@@ -18,6 +18,41 @@ await strapi.service('plugin::sms.sms').send({ to: phone, text: `Code: ${code}` 
   },
 
   async confirm(ctx) {
-    // логика подтверждения…
+    const { phone, code } = ctx.request.body;
+    if (!phone || !code) {
+      return ctx.badRequest('phone and code required');
+    }
+
+    const now = new Date();
+    const [otp] = await strapi.entityService.findMany('api::otp-code.otp-code', {
+      filters: { phone, code, used: false },
+      sort: { createdAt: 'desc' },
+      limit: 1,
+    });
+
+    if (!otp || new Date(otp.expires) < now) {
+      return ctx.badRequest('invalid code');
+    }
+
+    await strapi.entityService.update('api::otp-code.otp-code', otp.id, {
+      data: { used: true },
+    });
+
+    let user = await strapi.db
+      .query('plugin::users-permissions.user')
+      .findOne({ where: { phone } });
+
+    if (!user) {
+      const password = crypto.randomBytes(8).toString('hex');
+      user = await strapi.db
+        .query('plugin::users-permissions.user')
+        .create({ data: { username: phone, phone, password, confirmed: true } });
+    }
+
+    const token = await strapi
+      .service('plugin::users-permissions.jwt')
+      .issue({ id: user.id });
+
+    ctx.send({ jwt: token, user });
   },
 };
