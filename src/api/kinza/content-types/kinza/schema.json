@@ -69,6 +69,12 @@
     },
     "discountPrice": {
       "type": "integer"
+    },
+    "order_items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order-item.order-item",
+      "mappedBy": "kinzas"
     }
   }
 }

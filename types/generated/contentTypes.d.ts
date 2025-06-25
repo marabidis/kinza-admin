@@ -362,6 +362,54 @@ export interface AdminUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiAddressAddress extends Schema.CollectionType {
+  collectionName: 'addresses';
+  info: {
+    displayName: 'Address';
+    pluralName: 'addresses';
+    singularName: 'address';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    comment: Attribute.String;
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::address.address',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    flat: Attribute.String;
+    house: Attribute.String & Attribute.Required;
+    isDefault: Attribute.Boolean & Attribute.DefaultTo<false>;
+    lat: Attribute.Decimal;
+    lng: Attribute.Decimal;
+    orders: Attribute.Relation<
+      'api::address.address',
+      'oneToMany',
+      'api::order.order'
+    >;
+    street: Attribute.String & Attribute.Required;
+    type: Attribute.Enumeration<['home', 'work', 'other']> &
+      Attribute.Required &
+      Attribute.DefaultTo<'other'>;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::address.address',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    user: Attribute.Relation<
+      'api::address.address',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiCategoryCategory extends Schema.CollectionType {
   collectionName: 'categories';
   info: {
@@ -593,11 +641,61 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     mark: Attribute.String;
     minimumWeight: Attribute.Decimal;
     name_item: Attribute.String;
+    order_items: Attribute.Relation<
+      'api::kinza.kinza',
+      'oneToMany',
+      'api::order-item.order-item'
+    >;
     price: Attribute.Integer;
     publishedAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<
       'api::kinza.kinza',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    weight: Attribute.Decimal;
+  };
+}
+
+export interface ApiOrderItemOrderItem extends Schema.CollectionType {
+  collectionName: 'order_items';
+  info: {
+    description: '';
+    displayName: 'OrderItem';
+    pluralName: 'order-items';
+    singularName: 'order-item';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::order-item.order-item',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    kinzas: Attribute.Relation<
+      'api::order-item.order-item',
+      'manyToOne',
+      'api::kinza.kinza'
+    >;
+    order: Attribute.Relation<
+      'api::order-item.order-item',
+      'manyToOne',
+      'api::order.order'
+    >;
+    price: Attribute.Integer & Attribute.Required;
+    publishedAt: Attribute.DateTime;
+    qty: Attribute.Integer & Attribute.DefaultTo<1>;
+    titleCached: Attribute.String;
+    total: Attribute.Integer & Attribute.Required;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::order-item.order-item',
       'oneToOne',
       'admin::user'
     > &
@@ -618,6 +716,12 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    address: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'api::address.address'
+    >;
+    comment: Attribute.Text;
     createdAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::order.order',
@@ -625,13 +729,24 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'admin::user'
     > &
       Attribute.Private;
+    delivery: Attribute.Enumeration<['courier', 'pickup']>;
     details: Attribute.Text;
+    items: Attribute.Relation<
+      'api::order.order',
+      'oneToMany',
+      'api::order-item.order-item'
+    >;
     order_date: Attribute.DateTime;
     orderNumber: Attribute.Integer;
+    payment: Attribute.Enumeration<['card', 'cash', 'sbp']>;
     payment_method: Attribute.String;
+    payStatus: Attribute.Enumeration<['unpaid', 'paid', 'refunded']> &
+      Attribute.DefaultTo<'unpaid'>;
     phone: Attribute.String;
     publishedAt: Attribute.DateTime;
     shipping_address: Attribute.String;
+    status: Attribute.Enumeration<['new', 'cooking', 'on_way', 'done']> &
+      Attribute.DefaultTo<'new'>;
     total_price: Attribute.Integer;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<
@@ -640,6 +755,11 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'admin::user'
     > &
       Attribute.Private;
+    user: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1079,6 +1199,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     timestamps: true;
   };
   attributes: {
+    addresses: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::address.address'
+    >;
     blocked: Attribute.Boolean & Attribute.DefaultTo<false>;
     confirmationToken: Attribute.String & Attribute.Private;
     confirmed: Attribute.Boolean & Attribute.DefaultTo<false>;
@@ -1096,6 +1221,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
         maxLength: 254;
         minLength: 6;
       }>;
+    orders: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::order.order'
+    >;
     password: Attribute.Password &
       Attribute.Private &
       Attribute.SetMinMaxLength<{
@@ -1135,12 +1265,14 @@ declare module '@strapi/types' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::address.address': ApiAddressAddress;
       'api::category.category': ApiCategoryCategory;
       'api::delivery.delivery': ApiDeliveryDelivery;
       'api::email-order.email-order': ApiEmailOrderEmailOrder;
       'api::ingredient-option.ingredient-option': ApiIngredientOptionIngredientOption;
       'api::ingredient.ingredient': ApiIngredientIngredient;
       'api::kinza.kinza': ApiKinzaKinza;
+      'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::otp-code.otp-code': ApiOtpCodeOtpCode;
       'api::test.test': ApiTestTest;
