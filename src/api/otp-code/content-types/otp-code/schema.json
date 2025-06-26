@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "otp_codes",
+  "info": {
+    "singularName": "otp-code",
+    "pluralName": "otp-codes",
+    "displayName": "OTP Code"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "phone": { "type": "string" },
+    "code": { "type": "string" },
+    "expires": { "type": "datetime" },
+    "used": { "type": "boolean", "default": false }
+  }
+}

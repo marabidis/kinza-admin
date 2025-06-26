@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ingredient_options",
+  "info": {
+    "singularName": "ingredient-option",
+    "pluralName": "ingredient-options",
+    "displayName": "Ingredient_option",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "canRemove": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "canAdd": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    "canDouble": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "default": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "addPrice": {
+      "type": "integer",
+      "default": 0
+    },
+    "doublePrice": {
+      "type": "integer",
+      "default": 0
+    },
+    "ingredient": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::ingredient.ingredient",
+      "inversedBy": "ingredient_option"
+    },
+    "katalogs": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::kinza.kinza",
+      "inversedBy": "ingredient_options"
+    }
+  }
+}

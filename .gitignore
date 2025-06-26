@@ -112,7 +112,7 @@ exports
 dist
 build
 .strapi-updater.json
-
+.env.prod
 
 
 n8n_db

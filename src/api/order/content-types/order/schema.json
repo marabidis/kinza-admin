@@ -32,6 +32,61 @@
     },
     "order_date": {
       "type": "datetime"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "cooking",
+        "on_way",
+        "done"
+      ],
+      "default": "new"
+    },
+    "payStatus": {
+      "type": "enumeration",
+      "enum": [
+        "unpaid",
+        "paid",
+        "refunded"
+      ],
+      "default": "unpaid"
+    },
+    "payment": {
+      "type": "enumeration",
+      "enum": [
+        "card",
+        "cash",
+        "sbp"
+      ]
+    },
+    "delivery": {
+      "type": "enumeration",
+      "enum": [
+        "courier",
+        "pickup"
+      ]
+    },
+    "comment": {
+      "type": "text"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "orders"
+    },
+    "address": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::address.address",
+      "inversedBy": "orders"
+    },
+    "items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order-item.order-item",
+      "mappedBy": "order"
     }
   }
 }

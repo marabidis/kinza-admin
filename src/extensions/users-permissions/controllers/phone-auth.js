@@ -1,0 +1,95 @@
+// src/extensions/users-permissions/controllers/phone-auth.js
+'use strict';
+const crypto = require('crypto');
+
+module.exports = {
+  /*────────────────────── /send ──────────────────────*/
+  async send(ctx) {
+    const { phone } = ctx.request.body;
+    if (!phone) return ctx.badRequest('phone required');
+
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+
+    await strapi.entityService.create('api::otp-code.otp-code', {
+      data: {
+        phone,
+        code,
+        expires: new Date(Date.now() + 5 * 60e3),
+        used: false,
+      },
+    });
+
+    await strapi.service('plugin::sms.sms').send({
+      to: phone,
+      text: `Код подтверждения: ${code}`,
+    });
+
+    ctx.send({ ok: true });
+  },
+
+  /*─────────────────── /confirm ──────────────────────*/
+  async confirm(ctx) {
+    const { phone, code } = ctx.request.body;
+    if (!phone || !code) return ctx.badRequest('phone and code required');
+
+    /* 1. Проверяем OTP */
+    const now = new Date();
+    const [otp] = await strapi.entityService.findMany(
+      'api::otp-code.otp-code',
+      {
+        filters: { phone, code, used: false },
+        sort: { createdAt: 'desc' },
+        limit: 1,
+      },
+    );
+
+    if (!otp || new Date(otp.expires) < now)
+      return ctx.badRequest('invalid code');
+
+    await strapi.entityService.update('api::otp-code.otp-code', otp.id, {
+      data: { used: true },
+    });
+
+    /* 2. Ищем роль “authenticated” (Strapi v4) */
+    const authRole = await strapi.db
+      .query('plugin::users-permissions.role')
+      .findOne({ where: { type: 'authenticated' } });
+
+    if (!authRole) {
+      return ctx.internalServerError('Role "authenticated" not found');
+    }
+
+    /* 3. Создаём или находим пользователя */
+    let user = await strapi.db
+      .query('plugin::users-permissions.user')
+      .findOne({ where: { phone } });
+
+    if (!user) {
+      user = await strapi.db.query('plugin::users-permissions.user').create({
+        data: {
+          username: phone,
+          phone,
+          password: crypto.randomBytes(8).toString('hex'),
+          confirmed: true,
+          role: authRole.id,
+        },
+      });
+    } else if (user.role !== authRole.id) {
+      await strapi.entityService.update(
+        'plugin::users-permissions.user',
+        user.id,
+        { data: { role: authRole.id } },
+      );
+    }
+
+    /* 4. Выпускаем JWT */
+    const jwt = await strapi
+      .service('plugin::users-permissions.jwt')
+      .issue({ id: user.id });
+
+    /* 5. Санитизируем ответ */
+    const { password, resetPasswordToken, ...safeUser } = user;
+
+    ctx.send({ jwt, user: safeUser });
+  },
+};
