@@ -446,6 +446,38 @@ export interface ApiCategoryCategory extends Schema.CollectionType {
   };
 }
 
+export interface ApiDeliveryConditionDeliveryCondition
+  extends Schema.CollectionType {
+  collectionName: 'delivery_conditions';
+  info: {
+    displayName: 'Delivery Condition';
+    pluralName: 'delivery-conditions';
+    singularName: 'delivery-condition';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::delivery-condition.delivery-condition',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    Name: Attribute.String & Attribute.Required;
+    order: Attribute.Integer;
+    publishedAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::delivery-condition.delivery-condition',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiDeliveryDelivery extends Schema.CollectionType {
   collectionName: 'deliveries';
   info: {
@@ -1267,6 +1299,7 @@ declare module '@strapi/types' {
       'admin::user': AdminUser;
       'api::address.address': ApiAddressAddress;
       'api::category.category': ApiCategoryCategory;
+      'api::delivery-condition.delivery-condition': ApiDeliveryConditionDeliveryCondition;
       'api::delivery.delivery': ApiDeliveryDelivery;
       'api::email-order.email-order': ApiEmailOrderEmailOrder;
       'api::ingredient-option.ingredient-option': ApiIngredientOptionIngredientOption;
