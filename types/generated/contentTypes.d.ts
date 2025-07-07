@@ -497,9 +497,12 @@ export interface ApiDeliveryDelivery extends Schema.CollectionType {
       'admin::user'
     > &
       Attribute.Private;
-    delivery: Attribute.Integer;
+    Description: Attribute.String;
+    minOrderForFree: Attribute.Integer;
+    Order: Attribute.Integer;
     publishedAt: Attribute.DateTime;
-    title: Attribute.String;
+    Slug: Attribute.String & Attribute.Required & Attribute.Unique;
+    Title: Attribute.String & Attribute.Required;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<
       'api::delivery.delivery',
@@ -680,6 +683,7 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     >;
     price: Attribute.Integer;
     publishedAt: Attribute.DateTime;
+    tags: Attribute.Relation<'api::kinza.kinza', 'manyToMany', 'api::tag.tag'>;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<
       'api::kinza.kinza',
@@ -824,6 +828,35 @@ export interface ApiOtpCodeOtpCode extends Schema.CollectionType {
     > &
       Attribute.Private;
     used: Attribute.Boolean & Attribute.DefaultTo<false>;
+  };
+}
+
+export interface ApiTagTag extends Schema.CollectionType {
+  collectionName: 'tags';
+  info: {
+    description: '';
+    displayName: 'Tag';
+    pluralName: 'tags';
+    singularName: 'tag';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    code: Attribute.String & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::tag.tag', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    kinzas: Attribute.Relation<
+      'api::tag.tag',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    name: Attribute.String;
+    publishedAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<'api::tag.tag', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
   };
 }
 
@@ -1308,6 +1341,7 @@ declare module '@strapi/types' {
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::otp-code.otp-code': ApiOtpCodeOtpCode;
+      'api::tag.tag': ApiTagTag;
       'api::test.test': ApiTestTest;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

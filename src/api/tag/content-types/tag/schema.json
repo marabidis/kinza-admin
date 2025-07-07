@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tags",
+  "info": {
+    "singularName": "tag",
+    "pluralName": "tags",
+    "displayName": "Tag",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string",
+      "unique": true
+    },
+    "kinzas": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::kinza.kinza",
+      "mappedBy": "tags"
+    }
+  }
+}
