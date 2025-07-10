@@ -81,6 +81,11 @@
       "relation": "manyToMany",
       "target": "api::tag.tag",
       "inversedBy": "kinzas"
+    },
+    "isSoldOut": {
+      "type": "boolean",
+      "default": false,
+      "required": true
     }
   }
 }

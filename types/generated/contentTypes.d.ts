@@ -672,6 +672,9 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
       'manyToMany',
       'api::ingredient.ingredient'
     >;
+    isSoldOut: Attribute.Boolean &
+      Attribute.Required &
+      Attribute.DefaultTo<false>;
     isWeightBased: Attribute.Boolean & Attribute.DefaultTo<false>;
     mark: Attribute.String;
     minimumWeight: Attribute.Decimal;
