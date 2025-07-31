@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "allergens",
+  "info": {
+    "singularName": "allergen",
+    "pluralName": "allergens",
+    "displayName": "allergen"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "kinzas": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::kinza.kinza",
+      "mappedBy": "allergens"
+    }
+  }
+}

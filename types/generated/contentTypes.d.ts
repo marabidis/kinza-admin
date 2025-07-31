@@ -365,6 +365,7 @@ export interface AdminUser extends Schema.CollectionType {
 export interface ApiAddressAddress extends Schema.CollectionType {
   collectionName: 'addresses';
   info: {
+    description: '';
     displayName: 'Address';
     pluralName: 'addresses';
     singularName: 'address';
@@ -382,6 +383,7 @@ export interface ApiAddressAddress extends Schema.CollectionType {
     > &
       Attribute.Private;
     flat: Attribute.String;
+    fullLine: Attribute.String & Attribute.Required;
     house: Attribute.String & Attribute.Required;
     isDefault: Attribute.Boolean & Attribute.DefaultTo<false>;
     lat: Attribute.Decimal;
@@ -407,6 +409,41 @@ export interface ApiAddressAddress extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+  };
+}
+
+export interface ApiAllergenAllergen extends Schema.CollectionType {
+  collectionName: 'allergens';
+  info: {
+    displayName: 'allergen';
+    pluralName: 'allergens';
+    singularName: 'allergen';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::allergen.allergen',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    kinzas: Attribute.Relation<
+      'api::allergen.allergen',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    publishedAt: Attribute.DateTime;
+    title: Attribute.String & Attribute.Required & Attribute.Unique;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::allergen.allergen',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
   };
 }
 
@@ -645,6 +682,11 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    allergens: Attribute.Relation<
+      'api::kinza.kinza',
+      'manyToMany',
+      'api::allergen.allergen'
+    >;
     blurHash: Attribute.String & Attribute.DefaultTo<'\u2026'>;
     categories: Attribute.Relation<
       'api::kinza.kinza',
@@ -679,6 +721,7 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     mark: Attribute.String;
     minimumWeight: Attribute.Decimal;
     name_item: Attribute.String;
+    nutrition: Attribute.Component<'nutrition.nutrition'>;
     order_items: Attribute.Relation<
       'api::kinza.kinza',
       'oneToMany',
@@ -1334,6 +1377,7 @@ declare module '@strapi/types' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::address.address': ApiAddressAddress;
+      'api::allergen.allergen': ApiAllergenAllergen;
       'api::category.category': ApiCategoryCategory;
       'api::delivery-condition.delivery-condition': ApiDeliveryConditionDeliveryCondition;
       'api::delivery.delivery': ApiDeliveryDelivery;
