@@ -4,7 +4,8 @@
   "info": {
     "singularName": "address",
     "pluralName": "addresses",
-    "displayName": "Address"
+    "displayName": "Address",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -18,22 +19,51 @@
     },
     "type": {
       "type": "enumeration",
-      "enum": ["home", "work", "other"],
+      "enum": [
+        "home",
+        "work",
+        "other"
+      ],
       "default": "other",
       "required": true
     },
-    "street": { "type": "string", "required": true },
-    "house": { "type": "string", "required": true },
-    "flat": { "type": "string" },
-    "comment": { "type": "string" },
-    "lat": { "type": "decimal", "precision": 9, "scale": 6 },
-    "lng": { "type": "decimal", "precision": 9, "scale": 6 },
-    "isDefault": { "type": "boolean", "default": false },
+    "street": {
+      "type": "string",
+      "required": true
+    },
+    "house": {
+      "type": "string",
+      "required": true
+    },
+    "flat": {
+      "type": "string"
+    },
+    "comment": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "decimal",
+      "precision": 9,
+      "scale": 6
+    },
+    "lng": {
+      "type": "decimal",
+      "precision": 9,
+      "scale": 6
+    },
+    "isDefault": {
+      "type": "boolean",
+      "default": false
+    },
     "orders": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::order.order",
       "mappedBy": "address"
+    },
+    "fullLine": {
+      "type": "string",
+      "required": true
     }
   }
 }

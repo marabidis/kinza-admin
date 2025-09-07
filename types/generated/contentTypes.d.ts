@@ -365,6 +365,7 @@ export interface AdminUser extends Schema.CollectionType {
 export interface ApiAddressAddress extends Schema.CollectionType {
   collectionName: 'addresses';
   info: {
+    description: '';
     displayName: 'Address';
     pluralName: 'addresses';
     singularName: 'address';
@@ -382,6 +383,7 @@ export interface ApiAddressAddress extends Schema.CollectionType {
     > &
       Attribute.Private;
     flat: Attribute.String;
+    fullLine: Attribute.String & Attribute.Required;
     house: Attribute.String & Attribute.Required;
     isDefault: Attribute.Boolean & Attribute.DefaultTo<false>;
     lat: Attribute.Decimal;
@@ -407,6 +409,41 @@ export interface ApiAddressAddress extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+  };
+}
+
+export interface ApiAllergenAllergen extends Schema.CollectionType {
+  collectionName: 'allergens';
+  info: {
+    displayName: 'allergen';
+    pluralName: 'allergens';
+    singularName: 'allergen';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::allergen.allergen',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    kinzas: Attribute.Relation<
+      'api::allergen.allergen',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    publishedAt: Attribute.DateTime;
+    title: Attribute.String & Attribute.Required & Attribute.Unique;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::allergen.allergen',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
   };
 }
 
@@ -446,6 +483,38 @@ export interface ApiCategoryCategory extends Schema.CollectionType {
   };
 }
 
+export interface ApiDeliveryConditionDeliveryCondition
+  extends Schema.CollectionType {
+  collectionName: 'delivery_conditions';
+  info: {
+    displayName: 'Delivery Condition';
+    pluralName: 'delivery-conditions';
+    singularName: 'delivery-condition';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::delivery-condition.delivery-condition',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    Name: Attribute.String & Attribute.Required;
+    order: Attribute.Integer;
+    publishedAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::delivery-condition.delivery-condition',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiDeliveryDelivery extends Schema.CollectionType {
   collectionName: 'deliveries';
   info: {
@@ -465,9 +534,12 @@ export interface ApiDeliveryDelivery extends Schema.CollectionType {
       'admin::user'
     > &
       Attribute.Private;
-    delivery: Attribute.Integer;
+    Description: Attribute.String;
+    minOrderForFree: Attribute.Integer;
+    Order: Attribute.Integer;
     publishedAt: Attribute.DateTime;
-    title: Attribute.String;
+    Slug: Attribute.String & Attribute.Required & Attribute.Unique;
+    Title: Attribute.String & Attribute.Required;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<
       'api::delivery.delivery',
@@ -610,6 +682,11 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    allergens: Attribute.Relation<
+      'api::kinza.kinza',
+      'manyToMany',
+      'api::allergen.allergen'
+    >;
     blurHash: Attribute.String & Attribute.DefaultTo<'\u2026'>;
     categories: Attribute.Relation<
       'api::kinza.kinza',
@@ -637,10 +714,14 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
       'manyToMany',
       'api::ingredient.ingredient'
     >;
+    isSoldOut: Attribute.Boolean &
+      Attribute.Required &
+      Attribute.DefaultTo<false>;
     isWeightBased: Attribute.Boolean & Attribute.DefaultTo<false>;
     mark: Attribute.String;
     minimumWeight: Attribute.Decimal;
     name_item: Attribute.String;
+    nutrition: Attribute.Component<'nutrition.nutrition'>;
     order_items: Attribute.Relation<
       'api::kinza.kinza',
       'oneToMany',
@@ -648,6 +729,7 @@ export interface ApiKinzaKinza extends Schema.CollectionType {
     >;
     price: Attribute.Integer;
     publishedAt: Attribute.DateTime;
+    tags: Attribute.Relation<'api::kinza.kinza', 'manyToMany', 'api::tag.tag'>;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<
       'api::kinza.kinza',
@@ -792,6 +874,35 @@ export interface ApiOtpCodeOtpCode extends Schema.CollectionType {
     > &
       Attribute.Private;
     used: Attribute.Boolean & Attribute.DefaultTo<false>;
+  };
+}
+
+export interface ApiTagTag extends Schema.CollectionType {
+  collectionName: 'tags';
+  info: {
+    description: '';
+    displayName: 'Tag';
+    pluralName: 'tags';
+    singularName: 'tag';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    code: Attribute.String & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::tag.tag', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    kinzas: Attribute.Relation<
+      'api::tag.tag',
+      'manyToMany',
+      'api::kinza.kinza'
+    >;
+    name: Attribute.String;
+    publishedAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<'api::tag.tag', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
   };
 }
 
@@ -1266,7 +1377,9 @@ declare module '@strapi/types' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::address.address': ApiAddressAddress;
+      'api::allergen.allergen': ApiAllergenAllergen;
       'api::category.category': ApiCategoryCategory;
+      'api::delivery-condition.delivery-condition': ApiDeliveryConditionDeliveryCondition;
       'api::delivery.delivery': ApiDeliveryDelivery;
       'api::email-order.email-order': ApiEmailOrderEmailOrder;
       'api::ingredient-option.ingredient-option': ApiIngredientOptionIngredientOption;
@@ -1275,6 +1388,7 @@ declare module '@strapi/types' {
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::otp-code.otp-code': ApiOtpCodeOtpCode;
+      'api::tag.tag': ApiTagTag;
       'api::test.test': ApiTestTest;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

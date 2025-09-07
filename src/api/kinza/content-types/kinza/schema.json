@@ -75,6 +75,28 @@
       "relation": "oneToMany",
       "target": "api::order-item.order-item",
       "mappedBy": "kinzas"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag",
+      "inversedBy": "kinzas"
+    },
+    "isSoldOut": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "nutrition": {
+      "type": "component",
+      "repeatable": false,
+      "component": "nutrition.nutrition"
+    },
+    "allergens": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::allergen.allergen",
+      "inversedBy": "kinzas"
     }
   }
 }

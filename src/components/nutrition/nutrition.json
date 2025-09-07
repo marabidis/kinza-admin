@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_nutrition_nutritions",
+  "info": {
+    "displayName": "nutrition"
+  },
+  "options": {},
+  "attributes": {
+    "kcal_100": {
+      "type": "decimal"
+    },
+    "protein_100": {
+      "type": "decimal"
+    },
+    "fat_100": {
+      "type": "decimal"
+    },
+    "carb_100": {
+      "type": "decimal"
+    },
+    "kcal_total": {
+      "type": "decimal",
+      "required": false
+    },
+    "protein_total": {
+      "type": "decimal"
+    },
+    "carb_total": {
+      "type": "decimal"
+    },
+    "fat_total": {
+      "type": "decimal"
+    },
+    "ingredients_text": {
+      "type": "string"
+    }
+  }
+}

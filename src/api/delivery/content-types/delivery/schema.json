@@ -12,11 +12,23 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "delivery": {
+    "Title": {
+      "type": "string",
+      "required": true
+    },
+    "Slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "Description": {
+      "type": "string"
+    },
+    "Order": {
       "type": "integer"
     },
-    "title": {
-      "type": "string"
+    "minOrderForFree": {
+      "type": "integer"
     }
   }
 }
