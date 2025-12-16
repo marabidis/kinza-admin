@@ -110,9 +110,7 @@ module.exports = ({ strapi }) => ({
     }
 
     if (!apiKey && !(email && password)) {
-      throw new Error(
-        'SMS-PROSTO: provide SMS_PROSTO_KEY or SMS_PROSTO_EMAIL+SMS_PROSTO_PASSWORD'
-      );
+      throw new Error('SMS-PROSTO: provide SMS_PROSTO_KEY or SMS_PROSTO_EMAIL+SMS_PROSTO_PASSWORD');
     }
 
     if (!text) {
@@ -172,9 +170,7 @@ module.exports = ({ strapi }) => ({
     }
 
     const data = payload?.response?.data ?? null;
-    strapi?.log?.info?.(
-      `[sms] SMS-PROSTO ok to=${redactPhone(phone)} id=${data?.id ?? 'n/a'}`
-    );
+    strapi?.log?.info?.(`[sms] SMS-PROSTO ok to=${redactPhone(phone)} id=${data?.id ?? 'n/a'}`);
 
     return {
       ok: true,
@@ -187,3 +183,7 @@ module.exports = ({ strapi }) => ({
     };
   },
 });
+
+module.exports._private = {
+  normalizePhone,
+};

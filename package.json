@@ -1,14 +1,21 @@
 {
   "name": "kinza-admin-v-2",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
   "description": "A Strapi application",
+  "license": "MIT",
+  "author": {
+    "name": "A Strapi developer"
+  },
   "scripts": {
-    "develop": "strapi develop",
-    "start": "strapi start",
     "build": "strapi build -d && npm run copy-plugin-files",
     "copy-plugin-files": "cp -R plugins/sms/package.json dist/plugins/sms/package.json",
-    "strapi": "strapi"
+    "develop": "strapi develop",
+    "format": "prettier --write --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
+    "lint": "prettier --check --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "test": "node --test test"
   },
   "dependencies": {
     "@strapi/plugin-email": "^4.24.1",
@@ -24,15 +31,14 @@
     "strapi-blurhash": "^1.1.1",
     "styled-components": "^5.3.11"
   },
-  "author": {
-    "name": "A Strapi developer"
-  },
-  "strapi": {
-    "uuid": "e0cc4046-a3a2-4490-938b-eaf8001d29bc"
+  "devDependencies": {
+    "prettier": "2.8.4"
   },
   "engines": {
     "node": ">=16.0.0 <=20.x.x",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "strapi": {
+    "uuid": "e0cc4046-a3a2-4490-938b-eaf8001d29bc"
+  }
 }

@@ -1,0 +1,107 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+      - stage
+
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install system deps (canvas)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            python3 \
+            pkg-config \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libjpeg-dev \
+            libgif-dev \
+            librsvg2-dev \
+            libvips-dev
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: ${{ needs.ci.result == 'success' }}
+    environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+
+    steps:
+      - name: Check deploy secrets
+        id: deploy_secrets
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          if [ -z "$SSH_PRIVATE_KEY" ] || [ -z "$SSH_HOST" ] || [ -z "$SSH_USER" ] || [ -z "$DEPLOY_PATH" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Deploy is skipped: required secrets are not set."
+            exit 0
+          fi
+
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
+      - name: Setup SSH agent
+        if: ${{ steps.deploy_secrets.outputs.enabled == 'true' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known_hosts
+        if: ${{ steps.deploy_secrets.outputs.enabled == 'true' }}
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${SSH_PORT:-22}" "${SSH_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        if: ${{ steps.deploy_secrets.outputs.enabled == 'true' }}
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+        run: |
+          ssh -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" 'bash -se' <<EOF
+          set -euo pipefail
+          cd "${DEPLOY_PATH}"
+          git fetch --all --prune
+          git checkout "${DEPLOY_BRANCH}"
+          git reset --hard "origin/${DEPLOY_BRANCH}"
+          docker compose up -d --build --force-recreate strapi
+          EOF

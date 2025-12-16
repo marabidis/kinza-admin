@@ -1,0 +1,10 @@
+node_modules
+dist
+.strapi
+.cache
+.build
+n8n_db
+database
+*.sql
+*.session.sql
+.DS_Store
