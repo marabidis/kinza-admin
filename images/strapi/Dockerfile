@@ -1,21 +1,23 @@
-FROM node:22-alpine
+FROM node:20-bookworm-slim
 
-RUN apk add --no-cache \
-      build-base \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
       python3 \
-      cairo-dev \
-      pango-dev \
-      jpeg-dev \
-      giflib-dev \
-      librsvg-dev \
-      vips-dev
+      pkg-config \
+      libcairo2-dev \
+      libpango1.0-dev \
+      libjpeg-dev \
+      libgif-dev \
+      librsvg2-dev \
+      libvips-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
