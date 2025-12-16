@@ -10,7 +10,7 @@ module.exports = {
 
     const code = Math.floor(1000 + Math.random() * 9000).toString();
 
-    await strapi.entityService.create('api::otp-code.otp-code', {
+    const otp = await strapi.entityService.create('api::otp-code.otp-code', {
       data: {
         phone,
         code,
@@ -19,12 +19,25 @@ module.exports = {
       },
     });
 
-    await strapi.service('plugin::sms.sms').send({
-      to: phone,
-      text: `Код подтверждения: ${code}`,
-    });
+    try {
+      await strapi.service('plugin::sms.sms').send({
+        to: phone,
+        text: `Код подтверждения: ${code}`,
+        priority: 1,
+        externalId: String(otp.id),
+      });
+    } catch (error) {
+      strapi.log.error('phone-auth.send: failed to send SMS', error);
+      if (typeof error?.code === 'number') {
+        await strapi.entityService
+          .update('api::otp-code.otp-code', otp.id, { data: { used: true } })
+          .catch(() => {});
+      }
+      return ctx.internalServerError('sms send failed');
+    }
 
-    ctx.send({ ok: true });
+    const smsMode = String(process.env.SMS_MODE || 'mock').toLowerCase();
+    ctx.send({ ok: true, ...(smsMode === 'real' ? {} : { code }) });
   },
 
   /*─────────────────── /confirm ──────────────────────*/

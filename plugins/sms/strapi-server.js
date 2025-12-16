@@ -2,14 +2,12 @@
 
 'use strict';
 
+const smsService = require('./server/services/sms');
+
 module.exports = ({ strapi }) => ({
   register() {},
   bootstrap() {},
   services: {
-    sms: {
-      async send({ to, text }) {
-        return true;Í
-      },
-    },
+    sms: smsService({ strapi }),
   },
 });
