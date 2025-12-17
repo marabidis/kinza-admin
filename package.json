@@ -11,8 +11,8 @@
     "build": "strapi build -d && npm run copy-plugin-files",
     "copy-plugin-files": "cp -R plugins/sms/package.json dist/plugins/sms/package.json",
     "develop": "strapi develop",
-    "format": "prettier --write --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
-    "lint": "prettier --check --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
+    "format": "prettier --write --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"docker-compose.yml\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
+    "lint": "prettier --check --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"docker-compose.yml\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
     "start": "strapi start",
     "strapi": "strapi",
     "test": "node --test test"

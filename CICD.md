@@ -4,7 +4,8 @@
 
 1. запускает проверки (lint + test)
 2. собирает проект
-3. деплоит на сервер через SSH + `docker compose`
+3. собирает Docker-образ и пушит в registry
+4. деплоит на сервер через SSH + `docker compose` (pull готового образа)
 
 Пайплайн запускается только для веток `master` и `stage`.
 
@@ -33,6 +34,7 @@ Workflow: `.github/workflows/ci-cd.yml`
 3. `npm run lint`
 4. `npm test`
 5. `npm run build`
+6. Docker build & push образа `strapi` в registry (если настроены секреты)
 
 ### Шаги CD (deploy)
 
@@ -47,6 +49,12 @@ Deploy запускается только если:
 - `git fetch`
 - `git checkout <branch>`
 - `git reset --hard origin/<branch>`
+- `docker login` (если задан registry и креды)
+- `docker compose pull strapi` (тянем готовый образ)
+- `docker compose up -d --no-build --force-recreate strapi`
+
+Если registry-секреты не заданы, workflow делает fallback на локальную сборку на сервере:
+
 - `docker compose up -d --build --force-recreate strapi`
 
 ## Какие секреты нужны (GitHub)
@@ -66,6 +74,16 @@ Deploy запускается только если:
 - `SSH_PRIVATE_KEY` — приватный ключ (deploy key)
 - `DEPLOY_PATH` — путь на сервере, где лежит репозиторий (например `/opt/kinza-admin-v2`)
 
+### Secrets (Docker registry)
+
+Чтобы деплоить “docker way” (pull готового образа), добавь:
+
+- `DOCKER_REGISTRY` — адрес registry, например `ghcr.io` или `registry.example.com`
+- `DOCKER_IMAGE` — путь образа без тега, например `marabidis/kinza-admin-strapi`
+- `DOCKER_USERNAME` — логин для registry
+- `DOCKER_PASSWORD` — пароль/токен для registry
+- `DOCKER_PLATFORMS` — (опционально) платформы для buildx, например `linux/amd64,linux/arm64` (по умолчанию `linux/amd64`)
+
 ## Подготовка сервера (один раз)
 
 1. Установить Docker + Docker Compose plugin (`docker compose ...`).
@@ -75,12 +93,26 @@ Deploy запускается только если:
 
 `docker compose up -d --build --force-recreate strapi`
 
+Если используешь registry (готовые образы), то на сервере можно проверять так:
+
+`STRAPI_IMAGE=<registry>/<image>:<tag> docker compose pull strapi && STRAPI_IMAGE=<registry>/<image>:<tag> docker compose up -d --no-build --force-recreate strapi`
+
 ## Как проверить локально (до пуша)
 
 - `npm ci`
 - `npm run lint`
 - `npm test`
 - `npm run build`
+
+## Локальная работа через Docker
+
+В `docker-compose.yml` для `strapi` задан `image` + `build`.
+
+- **Локально (сборка из исходников):**
+  - `docker compose up -d --build --force-recreate strapi`
+- **Локально/на сервере (запуск готового образа из registry):**
+  - `STRAPI_IMAGE=<registry>/<image>:<tag> docker compose pull strapi`
+  - `STRAPI_IMAGE=<registry>/<image>:<tag> docker compose up -d --no-build --force-recreate strapi`
 
 ## Что нужно от тебя для финальной настройки deploy
 
