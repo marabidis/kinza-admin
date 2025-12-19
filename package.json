@@ -11,8 +11,8 @@
     "build": "strapi build -d && npm run copy-plugin-files",
     "copy-plugin-files": "cp -R plugins/sms/package.json dist/plugins/sms/package.json",
     "develop": "strapi develop",
-    "format": "prettier --write --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"docker-compose.yml\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
-    "lint": "prettier --check --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"docker-compose.yml\" \"package.json\" \"package-lock.json\" \"CICD.md\" \".prettierrc.json\" \".prettierignore\"",
+    "format": "prettier --write --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"src/utils/store-status.js\" \"src/api/store-status/**/*\" \"src/api/store-setting/content-types/store-setting/schema.json\" \"src/components/store/*.json\" \"src/api/order/controllers/order.ts\" \"docker-compose.yml\" \"package.json\" \"package-lock.json\" \"CICD.md\" \"PROJECT_DOCUMENTATION.md\" \".prettierrc.json\" \".prettierignore\"",
+    "lint": "prettier --check --ignore-unknown \".github/**/*\" \"test/**/*\" \"plugins/sms/server/services/sms.js\" \"src/utils/store-status.js\" \"src/api/store-status/**/*\" \"src/api/store-setting/content-types/store-setting/schema.json\" \"src/components/store/*.json\" \"src/api/order/controllers/order.ts\" \"docker-compose.yml\" \"package.json\" \"package-lock.json\" \"CICD.md\" \"PROJECT_DOCUMENTATION.md\" \".prettierrc.json\" \".prettierignore\"",
     "start": "strapi start",
     "strapi": "strapi",
     "test": "node --test test"
@@ -24,6 +24,7 @@
     "@strapi/provider-upload-aws-s3": "^4.24.1",
     "@strapi/strapi": "^4.24.1",
     "canvas": "^3.1.0",
+    "luxon": "3.5.0",
     "pg": "8.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

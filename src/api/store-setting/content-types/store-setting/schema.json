@@ -1,0 +1,56 @@
+{
+  "kind": "singleType",
+  "collectionName": "store_settings",
+  "info": {
+    "singularName": "store-setting",
+    "pluralName": "store-settings",
+    "displayName": "Store Settings",
+    "description": "Global settings for the single store"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "timezone": {
+      "type": "string",
+      "required": true,
+      "default": "Europe/Saratov"
+    },
+    "orderCutoffMinutes": {
+      "type": "integer",
+      "required": true,
+      "min": 10,
+      "max": 60,
+      "default": 30
+    },
+    "deliveryEnabled": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "pickupEnabled": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "isPaused": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "pauseMessage": {
+      "type": "text"
+    },
+    "weeklySchedule": {
+      "type": "component",
+      "repeatable": true,
+      "component": "store.schedule-day"
+    },
+    "overrides": {
+      "type": "component",
+      "repeatable": true,
+      "component": "store.schedule-override"
+    }
+  }
+}

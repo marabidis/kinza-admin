@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_store_schedule_days",
+  "info": {
+    "displayName": "Schedule Day",
+    "description": "Weekly opening hours for a specific day"
+  },
+  "options": {},
+  "attributes": {
+    "dayOfWeek": {
+      "type": "enumeration",
+      "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      "required": true
+    },
+    "isClosed": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "opensAt": {
+      "type": "time"
+    },
+    "closesAt": {
+      "type": "time"
+    }
+  }
+}

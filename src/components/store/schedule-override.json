@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_store_schedule_overrides",
+  "info": {
+    "displayName": "Schedule Override",
+    "description": "Date-specific override (holiday/special hours)"
+  },
+  "options": {},
+  "attributes": {
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "isClosed": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "opensAt": {
+      "type": "time"
+    },
+    "closesAt": {
+      "type": "time"
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}
