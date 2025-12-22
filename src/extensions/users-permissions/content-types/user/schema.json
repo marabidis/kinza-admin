@@ -48,6 +48,10 @@
       "type": "boolean",
       "default": false
     },
+    "deletedAt": {
+      "type": "datetime",
+      "private": true
+    },
     "role": {
       "type": "relation",
       "relation": "manyToOne",

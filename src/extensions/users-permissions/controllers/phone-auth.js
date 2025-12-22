@@ -77,6 +77,10 @@ module.exports = {
       .query('plugin::users-permissions.user')
       .findOne({ where: { phone } });
 
+    if (user && (user.blocked || user.deletedAt)) {
+      return ctx.forbidden('account_blocked');
+    }
+
     if (!user) {
       user = await strapi.db.query('plugin::users-permissions.user').create({
         data: {
@@ -101,7 +105,7 @@ module.exports = {
       .issue({ id: user.id });
 
     /* 5. Санитизируем ответ */
-    const { password, resetPasswordToken, ...safeUser } = user;
+    const { password, resetPasswordToken, deletedAt, ...safeUser } = user;
 
     ctx.send({ jwt, user: safeUser });
   },
