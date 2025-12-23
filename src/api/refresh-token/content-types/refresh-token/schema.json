@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "refresh_tokens",
+  "info": {
+    "singularName": "refresh-token",
+    "pluralName": "refresh-tokens",
+    "displayName": "Refresh Token"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": false
+    },
+    "content-type-builder": {
+      "visible": false
+    }
+  },
+  "attributes": {
+    "tokenHash": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "private": true
+    },
+    "expiresAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "revokedAt": {
+      "type": "datetime"
+    },
+    "lastUsedAt": {
+      "type": "datetime"
+    },
+    "deviceId": {
+      "type": "string"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

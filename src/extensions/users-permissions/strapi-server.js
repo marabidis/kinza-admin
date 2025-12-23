@@ -23,6 +23,12 @@ module.exports = (plugin) => {
       handler: 'plugin::users-permissions.phone-auth.confirm',
       config:  { auth: false, prefix: '' },
     },
+    {
+      method:  'POST',
+      path:    '/phone-auth/refresh',
+      handler: 'plugin::users-permissions.phone-auth.refresh',
+      config:  { auth: false, prefix: '' },
+    },
   );
 
   /* 4. Логируем для проверки */

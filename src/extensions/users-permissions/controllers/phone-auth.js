@@ -2,6 +2,50 @@
 'use strict';
 const crypto = require('crypto');
 
+const ACCESS_TOKEN_TTL = process.env.ACCESS_TOKEN_TTL || '7d';
+const REFRESH_TOKEN_TTL_DAYS = Number.parseInt(
+  process.env.REFRESH_TOKEN_TTL_DAYS || '30',
+  10,
+);
+const REFRESH_TOKEN_BYTES = Number.parseInt(
+  process.env.REFRESH_TOKEN_BYTES || '64',
+  10,
+);
+
+const getPositiveInt = (value, fallback) =>
+  Number.isFinite(value) && value > 0 ? value : fallback;
+
+const REFRESH_TOKEN_TTL_MS =
+  getPositiveInt(REFRESH_TOKEN_TTL_DAYS, 30) * 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_BYTE_LENGTH = getPositiveInt(REFRESH_TOKEN_BYTES, 64);
+
+const hashRefreshToken = (token) =>
+  crypto.createHash('sha256').update(token).digest('hex');
+
+const issueAccessToken = (userId) =>
+  strapi
+    .service('plugin::users-permissions.jwt')
+    .issue({ id: userId }, { expiresIn: ACCESS_TOKEN_TTL });
+
+const createRefreshToken = async ({ userId, deviceId }) => {
+  const token = crypto.randomBytes(REFRESH_TOKEN_BYTE_LENGTH).toString('hex');
+  const tokenHash = hashRefreshToken(token);
+  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
+
+  await strapi.db.query('api::refresh-token.refresh-token').create({
+    data: {
+      tokenHash,
+      expiresAt,
+      revokedAt: null,
+      lastUsedAt: null,
+      deviceId: deviceId || null,
+      user: userId,
+    },
+  });
+
+  return { token, expiresAt };
+};
+
 module.exports = {
   /*────────────────────── /send ──────────────────────*/
   async send(ctx) {
@@ -42,7 +86,7 @@ module.exports = {
 
   /*─────────────────── /confirm ──────────────────────*/
   async confirm(ctx) {
-    const { phone, code } = ctx.request.body;
+    const { phone, code, deviceId } = ctx.request.body;
     if (!phone || !code) return ctx.badRequest('phone and code required');
 
     /* 1. Проверяем OTP */
@@ -99,14 +143,73 @@ module.exports = {
       );
     }
 
-    /* 4. Выпускаем JWT */
-    const jwt = await strapi
-      .service('plugin::users-permissions.jwt')
-      .issue({ id: user.id });
+    /* 4. Выпускаем access + refresh */
+    const jwt = issueAccessToken(user.id);
+    const { token: refreshToken } = await createRefreshToken({
+      userId: user.id,
+      deviceId,
+    });
 
     /* 5. Санитизируем ответ */
     const { password, resetPasswordToken, deletedAt, ...safeUser } = user;
 
-    ctx.send({ jwt, user: safeUser });
+    ctx.send({ jwt, refreshToken, user: safeUser });
+  },
+
+  /*─────────────────── /refresh ──────────────────────*/
+  async refresh(ctx) {
+    const { refreshToken, deviceId } = ctx.request.body || {};
+    if (!refreshToken) return ctx.badRequest('refreshToken required');
+
+    const tokenHash = hashRefreshToken(refreshToken);
+    const now = new Date();
+
+    const existingToken = await strapi.db
+      .query('api::refresh-token.refresh-token')
+      .findOne({
+        where: { tokenHash },
+        populate: {
+          user: {
+            select: ['id', 'blocked', 'deletedAt'],
+          },
+        },
+      });
+
+    if (!existingToken) {
+      return ctx.unauthorized('invalid_refresh_token');
+    }
+
+    if (existingToken.revokedAt) {
+      return ctx.unauthorized('refresh_token_revoked');
+    }
+
+    if (existingToken.expiresAt && new Date(existingToken.expiresAt) < now) {
+      return ctx.unauthorized('refresh_token_expired');
+    }
+
+    if (!existingToken.user) {
+      return ctx.unauthorized('invalid_refresh_token');
+    }
+
+    if (existingToken.user.blocked || existingToken.user.deletedAt) {
+      return ctx.forbidden('account_blocked');
+    }
+
+    if (existingToken.deviceId && deviceId && existingToken.deviceId !== deviceId) {
+      return ctx.unauthorized('invalid_device');
+    }
+
+    await strapi.db.query('api::refresh-token.refresh-token').update({
+      where: { id: existingToken.id },
+      data: { revokedAt: now, lastUsedAt: now },
+    });
+
+    const jwt = issueAccessToken(existingToken.user.id);
+    const { token: newRefreshToken } = await createRefreshToken({
+      userId: existingToken.user.id,
+      deviceId: deviceId || existingToken.deviceId,
+    });
+
+    ctx.send({ jwt, refreshToken: newRefreshToken });
   },
 };

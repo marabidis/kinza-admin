@@ -57,6 +57,21 @@ export default {
       await strapi.db.connection('orders_user_links').whereIn('order_id', orderIds).del();
     }
 
+    const refreshTokenLinks = await strapi.db
+      .connection('refresh_tokens_user_links')
+      .select('refresh_token_id')
+      .where('user_id', user.id);
+
+    const refreshTokenIds = refreshTokenLinks
+      .map((row) => row.refresh_token_id)
+      .filter((tokenId) => typeof tokenId === 'number');
+
+    if (refreshTokenIds.length > 0) {
+      await strapi.db.query('api::refresh-token.refresh-token').deleteMany({
+        where: { id: { $in: refreshTokenIds } },
+      });
+    }
+
     await strapi.db.query('plugin::users-permissions.user').update({
       where: { id: user.id },
       data: {
