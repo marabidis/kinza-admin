@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
+import { buildDeliveryRules, resolveDeliveryFee } from '../../../utils/delivery-rules';
 
 const { ForbiddenError, ValidationError } = errors;
 
@@ -97,6 +98,10 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
     const body = ctx.request.body ?? {};
     const payload = body?.data && typeof body.data === 'object' ? body.data : body;
     const delivery = payload?.delivery;
+    if (delivery && !['courier', 'pickup'].includes(String(delivery))) {
+      return ctx.badRequest('invalid delivery');
+    }
+
     const requestedDelivery = String(delivery || 'courier');
     const isPickup = requestedDelivery === 'pickup';
 
@@ -124,6 +129,68 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       throw new ValidationError('Missing "data" payload in the request body');
     }
 
+    const totalPriceRaw = payload?.total_price ?? payload?.totalPrice;
+    const totalPrice = Number.parseInt(String(totalPriceRaw), 10);
+
+    if (!Number.isFinite(totalPrice)) {
+      return ctx.badRequest('total_price required');
+    }
+
+    const deliverySettings = await strapi.db
+      .query('api::delivery-setting.delivery-setting')
+      .findOne({
+        where: {},
+        populate: {
+          courierTiers: true,
+          pickupTiers: true,
+        },
+      });
+
+    const deliveryRules = buildDeliveryRules(deliverySettings);
+    const feeResult = resolveDeliveryFee({
+      deliveryType: requestedDelivery,
+      totalPrice,
+      rules: deliveryRules,
+    });
+
+    if (!feeResult.ok) {
+      if (feeResult.code === 'min_order_not_met') {
+        ctx.status = 409;
+        ctx.body = {
+          data: null,
+          error: {
+            status: 409,
+            name: 'MinOrderError',
+            message: 'min_order_not_met',
+            details: {
+              requiredMin: feeResult.requiredMin,
+              delivery: feeResult.deliveryType,
+              totalPrice,
+            },
+          },
+        };
+        return;
+      }
+
+      const httpStatus = feeResult.code === 'invalid_total' ? 400 : 503;
+      ctx.status = httpStatus;
+      ctx.body = {
+        data: null,
+        error: {
+          status: httpStatus,
+          name: httpStatus === 400 ? 'ValidationError' : 'ServiceUnavailableError',
+          message:
+            feeResult.code === 'invalid_total'
+              ? 'total_price required'
+              : 'delivery_rules_not_configured',
+          details: {
+            delivery: feeResult.deliveryType,
+          },
+        },
+      };
+      return;
+    }
+
     stripUserQuery(ctx);
     await this.validateQuery(ctx);
     const sanitizedQuery = await this.sanitizeQuery(ctx);
@@ -134,6 +201,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       data: {
         ...sanitizedInputData,
         user: user.id,
+        delivery_fee: feeResult.fee,
       },
     });
 

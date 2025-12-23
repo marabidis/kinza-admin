@@ -15,6 +15,9 @@
     "total_price": {
       "type": "integer"
     },
+    "delivery_fee": {
+      "type": "integer"
+    },
     "phone": {
       "type": "string"
     },

@@ -82,12 +82,13 @@ _Не храните реальные секреты в публичных ре�
 - **delivery-condition** (коллекция, D&P): `Name` (string, req), `order` (int).
 - **email-order** (single type, D&P): `email_order` (email) — куда слать уведомления.
 - **address** (коллекция, без D&P): связь manyToOne → user, поля `type` (enum home|work|other, req, default other), `street`/`house` (req string), `flat`, `comment` (string), `lat`/`lng` (decimal, 9,6), `isDefault` (bool), `fullLine` (req string), связь oneToMany ↔ orders.
-- **order** (коллекция, D&P): цены/метаданные заказа: `total_price` (int), `phone` (string), `payment_method` (string), `shipping_address` (string), `details` (text), `orderNumber` (int), `order_date` (datetime), `status` (enum new|cooking|on_way|done, default new), `payStatus` (enum unpaid|paid|refunded, default unpaid), `payment` (enum card|cash|sbp), `delivery` (enum courier|pickup), `comment` (text); связи manyToOne → user, manyToOne → address, oneToMany ↔ items.
+- **order** (коллекция, D&P): цены/метаданные заказа: `total_price` (int), `delivery_fee` (int), `phone` (string), `payment_method` (string), `shipping_address` (string), `details` (text), `orderNumber` (int), `order_date` (datetime), `status` (enum new|cooking|on_way|done, default new), `payStatus` (enum unpaid|paid|refunded, default unpaid), `payment` (enum card|cash|sbp), `delivery` (enum courier|pickup), `comment` (text); связи manyToOne → user, manyToOne → address, oneToMany ↔ items.
 - **order-item** (коллекция, D&P): `titleCached` (string), `price` (int, req), `qty` (int, default 1), `weight` (decimal), `total` (int, req); связь manyToOne → order, manyToOne → kinza.
 - **otp-code** (коллекция, без D&P): `phone` (string), `code` (string), `expires` (datetime), `used` (bool, default false).
 - **refresh-token** (коллекция, без D&P, скрыта в админке): `tokenHash` (string, private, unique), `expiresAt` (datetime), `revokedAt` (datetime), `lastUsedAt` (datetime), `deviceId` (string), связь manyToOne → user.
 - **test** (коллекция, D&P): `test` (string) — вспомогательный.
 - **Пользователь (users-permissions, расширение)**: добавлены `phone` (string, unique, regex `+?[0-9]{10,15}`), `deletedAt` (datetime, private), связи oneToMany ↔ addresses/orders. Email и username отмечены как required/unique.
+- **delivery-setting** (single type, без D&P): правила доставки `courierTiers`/`pickupTiers` (repeatable component `delivery.tier`: `label`, `minOrder`, `fee`, `order`).
 
 ## Аутентификация по телефону
 
@@ -132,12 +133,14 @@ _Не храните реальные секреты в публичных ре�
   - `overrides` — исключения по датам (праздники/особые часы)
 - Публичный эндпоинт:
   - `GET /api/store-status`
-  - Возвращает `isOpen`, `canOrderNow`, `canOrderDeliveryNow`, `canOrderPickupNow`, а также `opensAt/closesAt/lastOrderAt/nextChangeAt` (ISO timestamps в UTC) + `timezone` и `serverTime`.
+- Возвращает `isOpen`, `canOrderNow`, `canOrderDeliveryNow`, `canOrderPickupNow`, а также `opensAt/closesAt/lastOrderAt/nextChangeAt` (ISO timestamps в UTC) + `timezone` и `serverTime`.
+- Дополнительно возвращает `deliveryRules` с массивами правил для `courier` и `pickup` (из single type `delivery-setting`).
 - Защита на сервере:
   - `POST /api/orders` проверяет статус и вернёт ошибку, если сейчас нельзя принимать заказы:
     - `409 store_closed` (закрыто / прошёл lastOrderAt)
     - `423 store_paused` (ручная пауза)
     - `503 store_status_unavailable` (настройки ещё не созданы)
+  - `POST /api/orders` проверяет правила доставки (min order / fee) из `delivery-setting` и заполняет `delivery_fee`. Если правила не настроены — `503 delivery_rules_not_configured`, если не достигнут минимум — `409 min_order_not_met`.
 
 ## Загрузка файлов
 

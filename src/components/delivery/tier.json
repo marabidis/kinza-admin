@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_delivery_tiers",
+  "info": {
+    "displayName": "Delivery Tier",
+    "description": "Pricing tier for delivery or pickup"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "minOrder": {
+      "type": "integer",
+      "required": true
+    },
+    "fee": {
+      "type": "integer",
+      "required": true
+    },
+    "order": {
+      "type": "integer"
+    }
+  }
+}

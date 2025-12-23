@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "delivery_settings",
+  "info": {
+    "singularName": "delivery-setting",
+    "pluralName": "delivery-settings",
+    "displayName": "Delivery Settings",
+    "description": "Pricing rules for courier and pickup"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "courierTiers": {
+      "type": "component",
+      "repeatable": true,
+      "component": "delivery.tier"
+    },
+    "pickupTiers": {
+      "type": "component",
+      "repeatable": true,
+      "component": "delivery.tier"
+    }
+  }
+}
