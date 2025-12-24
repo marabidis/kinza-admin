@@ -19,6 +19,12 @@
       "targetField": "title",
       "required": true
     },
+    "order": {
+      "type": "integer"
+    },
+    "emoji": {
+      "type": "string"
+    },
     "products": {
       "type": "relation",
       "relation": "manyToMany",
