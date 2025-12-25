@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tag_emojis",
+  "info": {
+    "singularName": "tag-emoji",
+    "pluralName": "tag-emojis",
+    "displayName": "Tag_emoji",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "emoji": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "group": {
+      "type": "enumeration",
+      "enum": ["taste", "diet", "audience", "other"]
+    },
+    "priority": {
+      "type": "integer",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::tag.tag",
+      "mappedBy": "tagEmoji"
+    }
+  }
+}

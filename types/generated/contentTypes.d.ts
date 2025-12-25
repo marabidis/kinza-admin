@@ -877,6 +877,45 @@ export interface ApiOtpCodeOtpCode extends Schema.CollectionType {
   };
 }
 
+export interface ApiTagEmojiTagEmoji extends Schema.CollectionType {
+  collectionName: 'tag_emojis';
+  info: {
+    description: '';
+    displayName: 'Tag_emoji';
+    pluralName: 'tag-emojis';
+    singularName: 'tag-emoji';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::tag-emoji.tag-emoji',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    emoji: Attribute.String & Attribute.Required & Attribute.Unique;
+    group: Attribute.Enumeration<['taste', 'diet', 'audience', 'other']>;
+    is_active: Attribute.Boolean & Attribute.DefaultTo<true>;
+    label: Attribute.String & Attribute.Required;
+    priority: Attribute.Integer & Attribute.DefaultTo<0>;
+    tags: Attribute.Relation<
+      'api::tag-emoji.tag-emoji',
+      'oneToMany',
+      'api::tag.tag'
+    >;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::tag-emoji.tag-emoji',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTagTag extends Schema.CollectionType {
   collectionName: 'tags';
   info: {
@@ -889,17 +928,33 @@ export interface ApiTagTag extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    code: Attribute.String & Attribute.Unique;
+    code: Attribute.UID<'api::tag.tag', 'name'> & Attribute.Required;
     createdAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::tag.tag', 'oneToOne', 'admin::user'> &
       Attribute.Private;
+    description: Attribute.Text;
+    group: Attribute.Enumeration<['taste', 'diet', 'audience', 'other']> &
+      Attribute.Required;
+    is_active: Attribute.Boolean & Attribute.DefaultTo<true>;
+    is_filterable: Attribute.Boolean & Attribute.DefaultTo<true>;
     kinzas: Attribute.Relation<
       'api::tag.tag',
       'manyToMany',
       'api::kinza.kinza'
     >;
-    name: Attribute.String;
+    name: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        minLength: 2;
+        maxLength: 60;
+      }>;
+    priority: Attribute.Integer & Attribute.DefaultTo<0>;
     publishedAt: Attribute.DateTime;
+    tagEmoji: Attribute.Relation<
+      'api::tag.tag',
+      'manyToOne',
+      'api::tag-emoji.tag-emoji'
+    >;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<'api::tag.tag', 'oneToOne', 'admin::user'> &
       Attribute.Private;
@@ -1388,6 +1443,7 @@ declare module '@strapi/types' {
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::otp-code.otp-code': ApiOtpCodeOtpCode;
+      'api::tag-emoji.tag-emoji': ApiTagEmojiTagEmoji;
       'api::tag.tag': ApiTagTag;
       'api::test.test': ApiTestTest;
       'plugin::content-releases.release': PluginContentReleasesRelease;
