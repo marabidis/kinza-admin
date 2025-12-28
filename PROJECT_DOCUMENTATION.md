@@ -73,16 +73,16 @@ _Не храните реальные секреты в публичных ре�
 
 - **Компонент `nutrition.nutrition`**: `kcal_100`, `protein_100`, `fat_100`, `carb_100`, `kcal_total`, `protein_total`, `carb_total`, `fat_total` (decimal), `ingredients_text` (string).
 - **allergen** (коллекция, D&P): `title` (string, req, unique); связь manyToMany ↔ `kinza.allergens`.
-- **category** (коллекция, D&P): `title` (string), `slug` (uid от title, req), связь manyToMany ↔ `kinza.categories`.
+- **category** (коллекция, D&P): `title` (string), `slug` (uid от title, req), связь manyToMany ↔ `kinza.categories`; приборы: `cutleryEligibleDefault` (bool), `cutlerySetsDefault` (int).
 - **ingredient** (коллекция, D&P): `name` (string), `photo` (media[], images), связи manyToMany ↔ `kinza.ingredients`; oneToOne ↔ `ingredient-option.ingredient_option`.
 - **ingredient-option** (коллекция, D&P): флаги `canRemove`, `canAdd`, `canDouble`, `default` (boolean, с дефолтами), `addPrice`/`doublePrice` (int), связи oneToOne ↔ ingredient, manyToMany ↔ `kinza.ingredient_options`.
-- **kinza** (коллекция, D&P) — карточка товара: `mark`, `category`, `name_item`, `description_item` (string), `price`/`discountPrice` (int), `blurHash` (string, дефолт «…»), `ImageUrl` (media), `isWeightBased` (bool, default false), `minimumWeight`, `weight` (decimal), связи manyToMany ↔ categories/tags/allergens/ingredient_options, manyToMany inversedBy ↔ ingredients, oneToMany ↔ order_items. Компонент `nutrition`.
+- **kinza** (коллекция, D&P) — карточка товара: `mark`, `category`, `name_item`, `description_item` (string), `price`/`discountPrice` (int), `blurHash` (string, дефолт «…»), `ImageUrl` (media), `isWeightBased` (bool, default false), `minimumWeight`, `weight` (decimal), связи manyToMany ↔ categories/tags/allergens/ingredient_options, manyToMany inversedBy ↔ ingredients, oneToMany ↔ order_items. Компонент `nutrition`. Приборы: `cutleryMode` (enum inherit|force_on|force_off), `cutlerySetsOverride` (int, optional).
 - **tag** (коллекция, D&P): `name` (string), `code` (string, unique), связь manyToMany ↔ `kinza.tags`.
 - **delivery** (коллекция, D&P): `Title` (string, req), `Slug` (string, req, unique), `Description` (string), `Order` (int), `minOrderForFree` (int).
 - **delivery-condition** (коллекция, D&P): `Name` (string, req), `order` (int).
 - **email-order** (single type, D&P): `email_order` (email) — куда слать уведомления.
 - **address** (коллекция, без D&P): связь manyToOne → user, поля `type` (enum home|work|other, req, default other), `street`/`house` (req string), `flat`, `comment` (string), `lat`/`lng` (decimal, 9,6), `isDefault` (bool), `fullLine` (req string), связь oneToMany ↔ orders.
-- **order** (коллекция, D&P): цены/метаданные заказа: `total_price` (int), `delivery_fee` (int), `phone` (string), `payment_method` (string), `shipping_address` (string), `details` (text), `orderNumber` (int), `order_date` (datetime), `status` (enum new|cooking|on_way|done, default new), `payStatus` (enum unpaid|paid|refunded, default unpaid), `payment` (enum card|cash|sbp), `delivery` (enum courier|pickup), `comment` (text); связи manyToOne → user, manyToOne → address, oneToMany ↔ items.
+- **order** (коллекция, D&P): цены/метаданные заказа: `total_price` (int), `delivery_fee` (int), `phone` (string), `payment_method` (string), `shipping_address` (string), `details` (text), `orderNumber` (int), `order_date` (datetime), `status` (enum new|cooking|on_way|done, default new), `payStatus` (enum unpaid|paid|refunded, default unpaid), `payment` (enum card|cash|sbp), `delivery` (enum courier|pickup), `comment` (text); приборы: `cutlery_count`, `cutlery_free_count`, `cutlery_paid_count`, `cutlery_total` (int), `cutlery_requested` (bool). Связи manyToOne → user, manyToOne → address, oneToMany ↔ items.
 - **order-item** (коллекция, D&P): `titleCached` (string), `price` (int, req), `qty` (int, default 1), `weight` (decimal), `total` (int, req); связь manyToOne → order, manyToOne → kinza.
 - **otp-code** (коллекция, без D&P): `phone` (string), `code` (string), `expires` (datetime), `used` (bool, default false).
 - **refresh-token** (коллекция, без D&P, скрыта в админке): `tokenHash` (string, private, unique), `expiresAt` (datetime), `revokedAt` (datetime), `lastUsedAt` (datetime), `deviceId` (string), связь manyToOne → user.
@@ -129,18 +129,73 @@ _Не храните реальные секреты в публичных ре�
   - `orderCutoffMinutes` (10–60) — за сколько минут до закрытия прекращаем приём заказов
   - `deliveryEnabled`, `pickupEnabled` — доступность способов получения
   - `isPaused`, `pauseMessage` — ручная пауза приёма заказов
+  - `cutleryEnabled` — включение функции приборов
+  - `cutleryDefaultMode` (`opt_in` | `always_show`) — поведение блока в корзине
+  - `cutleryPrice` — цена за 1 доп. комплект
+  - `cutleryMax` — максимальное количество комплектов
+  - `cutleryFreeMode` (`recommended` | `fixed`) и `cutleryFreeFixed` (int)
   - `weeklySchedule` — расписание по дням недели (`opensAt`, `closesAt`, `isClosed`)
   - `overrides` — исключения по датам (праздники/особые часы)
 - Публичный эндпоинт:
   - `GET /api/store-status`
 - Возвращает `isOpen`, `canOrderNow`, `canOrderDeliveryNow`, `canOrderPickupNow`, а также `opensAt/closesAt/lastOrderAt/nextChangeAt` (ISO timestamps в UTC) + `timezone` и `serverTime`.
 - Дополнительно возвращает `deliveryRules` с массивами правил для `courier` и `pickup` (из single type `delivery-setting`).
+- Планируется вернуть `cutlery` (настройки приборов) для клиентов.
 - Защита на сервере:
   - `POST /api/orders` проверяет статус и вернёт ошибку, если сейчас нельзя принимать заказы:
     - `409 store_closed` (закрыто / прошёл lastOrderAt)
     - `423 store_paused` (ручная пауза)
     - `503 store_status_unavailable` (настройки ещё не созданы)
   - `POST /api/orders` проверяет правила доставки (min order / fee) из `delivery-setting` и заполняет `delivery_fee`. Если правила не настроены — `503 delivery_rules_not_configured`, если не достигнут минимум — `409 min_order_not_met`.
+
+## Приборы (cutlery)
+
+### Схема данных
+
+- Store Settings (`store-setting`):
+  - `cutleryEnabled` (bool, default true)
+  - `cutleryDefaultMode` (enum: `opt_in`, `always_show`, default `opt_in`)
+  - `cutleryPrice` (int, default 0)
+  - `cutleryMax` (int, default 20)
+  - `cutleryFreeMode` (enum: `recommended`, `fixed`, default `recommended`)
+  - `cutleryFreeFixed` (int, optional)
+- Category (`category`):
+  - `cutleryEligibleDefault` (bool, default false)
+  - `cutlerySetsDefault` (int, default 1)
+- Kinza (`kinza`):
+  - `cutleryMode` (enum: `inherit` | `force_on` | `force_off`, default `inherit`)
+  - `cutlerySetsOverride` (int, optional)
+- Order (`order`):
+  - `cutlery_count` (int, default 0)
+  - `cutlery_free_count` (int, default 0)
+  - `cutlery_paid_count` (int, default 0)
+  - `cutlery_total` (int, default 0)
+  - `cutlery_requested` (bool, default false)
+
+### Логика расчёта
+
+- `eligible`:
+  - если `kinza.cutleryMode = force_off` → false
+  - если `kinza.cutleryMode = force_on` → true
+  - иначе → `category.cutleryEligibleDefault`
+- `sets`:
+  - если `kinza.cutlerySetsOverride` задан → он
+  - иначе → `category.cutlerySetsDefault`
+- `recommended = sum(qty * sets)` по всем позициям, где `eligible = true`
+- `free_limit`:
+  - если `cutleryFreeMode = recommended` → `recommended`
+  - если `cutleryFreeMode = fixed` → `cutleryFreeFixed`
+- `paid = max(0, chosen_count - free_limit)`
+- `total = paid * cutleryPrice`
+
+### API контракт (клиент)
+
+- Клиенту нужны:
+  - настройки `cutlery` (из `store-setting` / `store-status`)
+  - `cutlery`-поля категорий и `kinza`-override
+- На создание заказа:
+  - клиент шлёт `cutlery_count`
+  - сервер пересчитывает `free/paid/total` и записывает в заказ
 
 ## Загрузка файлов
 

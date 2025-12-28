@@ -18,6 +18,30 @@
     "delivery_fee": {
       "type": "integer"
     },
+    "cutlery_requested": {
+      "type": "boolean",
+      "default": false
+    },
+    "cutlery_count": {
+      "type": "integer",
+      "min": 0,
+      "default": 0
+    },
+    "cutlery_free_count": {
+      "type": "integer",
+      "min": 0,
+      "default": 0
+    },
+    "cutlery_paid_count": {
+      "type": "integer",
+      "min": 0,
+      "default": 0
+    },
+    "cutlery_total": {
+      "type": "integer",
+      "min": 0,
+      "default": 0
+    },
     "phone": {
       "type": "string"
     },

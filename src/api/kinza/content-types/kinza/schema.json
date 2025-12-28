@@ -82,6 +82,20 @@
       "target": "api::tag.tag",
       "inversedBy": "kinzas"
     },
+    "cutleryMode": {
+      "type": "enumeration",
+      "enum": [
+        "inherit",
+        "force_on",
+        "force_off"
+      ],
+      "required": true,
+      "default": "inherit"
+    },
+    "cutlerySetsOverride": {
+      "type": "integer",
+      "min": 0
+    },
     "isSoldOut": {
       "type": "boolean",
       "default": false,

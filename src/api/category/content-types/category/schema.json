@@ -25,6 +25,17 @@
     "emoji": {
       "type": "string"
     },
+    "cutleryEligibleDefault": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "cutlerySetsDefault": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 1
+    },
     "products": {
       "type": "relation",
       "relation": "manyToMany",

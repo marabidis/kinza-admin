@@ -24,10 +24,25 @@ module.exports = ({ strapi }) => ({
 
     const status = computeStoreStatus(settings, { now });
     const deliveryRules = buildDeliveryRules(deliverySettings);
+    const cutlery = {
+      enabled: settings?.cutleryEnabled !== false,
+      defaultMode: settings?.cutleryDefaultMode === 'always_show' ? 'always_show' : 'opt_in',
+      price: Number.isFinite(Number(settings?.cutleryPrice))
+        ? Number(settings?.cutleryPrice)
+        : 0,
+      max: Number.isFinite(Number(settings?.cutleryMax))
+        ? Number(settings?.cutleryMax)
+        : 20,
+      freeMode: settings?.cutleryFreeMode === 'fixed' ? 'fixed' : 'recommended',
+      freeFixed: Number.isFinite(Number(settings?.cutleryFreeFixed))
+        ? Number(settings?.cutleryFreeFixed)
+        : 0,
+    };
 
     return {
       ...status,
       deliveryRules,
+      cutlery,
     };
   },
 });

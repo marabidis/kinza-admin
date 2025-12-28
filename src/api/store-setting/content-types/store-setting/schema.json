@@ -42,6 +42,45 @@
     "pauseMessage": {
       "type": "text"
     },
+    "cutleryEnabled": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "cutleryDefaultMode": {
+      "type": "enumeration",
+      "enum": [
+        "opt_in",
+        "always_show"
+      ],
+      "required": true,
+      "default": "opt_in"
+    },
+    "cutleryPrice": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 0
+    },
+    "cutleryMax": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 20
+    },
+    "cutleryFreeMode": {
+      "type": "enumeration",
+      "enum": [
+        "recommended",
+        "fixed"
+      ],
+      "required": true,
+      "default": "recommended"
+    },
+    "cutleryFreeFixed": {
+      "type": "integer",
+      "min": 0
+    },
     "weeklySchedule": {
       "type": "component",
       "repeatable": true,
