@@ -25,6 +25,24 @@
     "emoji": {
       "type": "string"
     },
+    "catalogLayout": {
+      "type": "enumeration",
+      "enum": [
+        "list",
+        "grid_2"
+      ],
+      "required": true,
+      "default": "list"
+    },
+    "detailLayout": {
+      "type": "enumeration",
+      "enum": [
+        "standard",
+        "full_screen"
+      ],
+      "required": true,
+      "default": "standard"
+    },
     "cutleryEligibleDefault": {
       "type": "boolean",
       "required": true,

@@ -39,6 +39,14 @@
         "images"
       ]
     },
+    "imageFull": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
     "isWeightBased": {
       "type": "boolean",
       "default": false
