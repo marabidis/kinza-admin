@@ -24,6 +24,30 @@
       "max": 60,
       "default": 30
     },
+    "prepTimeMinutes": {
+      "type": "integer",
+      "min": 0,
+      "max": 240,
+      "default": 25
+    },
+    "deliveryWindowMinutes": {
+      "type": "integer",
+      "min": 10,
+      "max": 120,
+      "default": 30
+    },
+    "slotStepMinutes": {
+      "type": "integer",
+      "min": 5,
+      "max": 60,
+      "default": 15
+    },
+    "minLeadMinutes": {
+      "type": "integer",
+      "min": 0,
+      "max": 240,
+      "default": 45
+    },
     "deliveryEnabled": {
       "type": "boolean",
       "required": true,

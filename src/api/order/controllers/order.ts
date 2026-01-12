@@ -5,6 +5,7 @@
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 import { buildDeliveryRules, resolveDeliveryFee } from '../../../utils/delivery-rules';
+import { validateDeliveryTimeSelection } from '../../../utils/delivery-time';
 
 const { ForbiddenError, ValidationError } = errors;
 
@@ -191,6 +192,34 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       return;
     }
 
+    const deliveryTimeModeRaw = payload?.deliveryTimeMode ?? payload?.delivery_time_mode;
+    const scheduledAtRaw = payload?.scheduledAt ?? payload?.scheduled_at;
+
+    const timeValidation = validateDeliveryTimeSelection({
+      status,
+      deliveryTime: status.deliveryTime,
+      mode: deliveryTimeModeRaw,
+      scheduledAtISO: scheduledAtRaw,
+    });
+
+    if (!timeValidation.ok) {
+      const httpStatus = timeValidation.errorType === 'unavailable' ? 409 : 400;
+      ctx.status = httpStatus;
+      ctx.body = {
+        data: null,
+        error: {
+          status: httpStatus,
+          name: httpStatus === 409 ? 'DeliveryTimeUnavailable' : 'ValidationError',
+          message:
+            httpStatus === 409 ? 'delivery_time_unavailable' : 'delivery_time_invalid',
+          details: {
+            delivery: requestedDelivery,
+          },
+        },
+      };
+      return;
+    }
+
     stripUserQuery(ctx);
     await this.validateQuery(ctx);
     const sanitizedQuery = await this.sanitizeQuery(ctx);
@@ -202,6 +231,9 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
         ...sanitizedInputData,
         user: user.id,
         delivery_fee: feeResult.fee,
+        deliveryTimeMode: timeValidation.mode,
+        scheduledAt: timeValidation.scheduledAt,
+        windowMinutes: timeValidation.windowMinutes,
       },
     });
 

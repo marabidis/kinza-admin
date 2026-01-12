@@ -60,6 +60,21 @@
     "order_date": {
       "type": "datetime"
     },
+    "deliveryTimeMode": {
+      "type": "enumeration",
+      "enum": [
+        "asap",
+        "slot"
+      ],
+      "default": "asap"
+    },
+    "scheduledAt": {
+      "type": "datetime"
+    },
+    "windowMinutes": {
+      "type": "integer",
+      "min": 0
+    },
     "status": {
       "type": "enumeration",
       "enum": [

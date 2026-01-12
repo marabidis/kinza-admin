@@ -2,6 +2,7 @@
 
 const { computeStoreStatus } = require('../../../utils/store-status');
 const { buildDeliveryRules } = require('../../../utils/delivery-rules');
+const { buildDeliveryTime } = require('../../../utils/delivery-time');
 
 module.exports = ({ strapi }) => ({
   async getStatus({ now } = {}) {
@@ -38,11 +39,13 @@ module.exports = ({ strapi }) => ({
         ? Number(settings?.cutleryFreeFixed)
         : 0,
     };
+    const deliveryTime = buildDeliveryTime({ status, settings });
 
     return {
       ...status,
       deliveryRules,
       cutlery,
+      deliveryTime,
     };
   },
 });

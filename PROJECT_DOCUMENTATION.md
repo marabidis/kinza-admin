@@ -82,7 +82,7 @@ _Не храните реальные секреты в публичных ре�
 - **delivery-condition** (коллекция, D&P): `Name` (string, req), `order` (int).
 - **email-order** (single type, D&P): `email_order` (email) — куда слать уведомления.
 - **address** (коллекция, без D&P): связь manyToOne → user, поля `type` (enum home|work|other, req, default other), `street`/`house` (req string), `flat`, `comment` (string), `lat`/`lng` (decimal, 9,6), `isDefault` (bool), `fullLine` (req string), связь oneToMany ↔ orders.
-- **order** (коллекция, D&P): цены/метаданные заказа: `total_price` (int), `delivery_fee` (int), `phone` (string), `payment_method` (string), `shipping_address` (string), `details` (text), `orderNumber` (int), `order_date` (datetime), `status` (enum new|cooking|on_way|done, default new), `payStatus` (enum unpaid|paid|refunded, default unpaid), `payment` (enum card|cash|sbp), `delivery` (enum courier|pickup), `comment` (text); приборы: `cutlery_count`, `cutlery_free_count`, `cutlery_paid_count`, `cutlery_total` (int), `cutlery_requested` (bool). Связи manyToOne → user, manyToOne → address, oneToMany ↔ items.
+- **order** (коллекция, D&P): цены/метаданные заказа: `total_price` (int), `delivery_fee` (int), `phone` (string), `payment_method` (string), `shipping_address` (string), `details` (text), `orderNumber` (int), `order_date` (datetime), `status` (enum new|cooking|on_way|done, default new), `payStatus` (enum unpaid|paid|refunded, default unpaid), `payment` (enum card|cash|sbp), `delivery` (enum courier|pickup), `comment` (text); время доставки: `deliveryTimeMode` (enum asap|slot), `scheduledAt` (datetime), `windowMinutes` (int); приборы: `cutlery_count`, `cutlery_free_count`, `cutlery_paid_count`, `cutlery_total` (int), `cutlery_requested` (bool). Связи manyToOne → user, manyToOne → address, oneToMany ↔ items.
 - **order-item** (коллекция, D&P): `titleCached` (string), `price` (int, req), `qty` (int, default 1), `weight` (decimal), `total` (int, req); связь manyToOne → order, manyToOne → kinza.
 - **otp-code** (коллекция, без D&P): `phone` (string), `code` (string), `expires` (datetime), `used` (bool, default false).
 - **refresh-token** (коллекция, без D&P, скрыта в админке): `tokenHash` (string, private, unique), `expiresAt` (datetime), `revokedAt` (datetime), `lastUsedAt` (datetime), `deviceId` (string), связь manyToOne → user.
@@ -127,6 +127,10 @@ _Не храните реальные секреты в публичных ре�
 - Поля:
   - `timezone` (по умолчанию `Europe/Saratov`)
   - `orderCutoffMinutes` (10–60) — за сколько минут до закрытия прекращаем приём заказов
+  - `prepTimeMinutes` — базовое время готовности (мин)
+  - `deliveryWindowMinutes` — длина окна доставки (мин)
+  - `slotStepMinutes` — шаг слотов (мин)
+  - `minLeadMinutes` — минимальный отступ от текущего времени до слота (мин)
   - `deliveryEnabled`, `pickupEnabled` — доступность способов получения
   - `isPaused`, `pauseMessage` — ручная пауза приёма заказов
   - `cutleryEnabled` — включение функции приборов
@@ -140,6 +144,9 @@ _Не храните реальные секреты в публичных ре�
   - `GET /api/store-status`
 - Возвращает `isOpen`, `canOrderNow`, `canOrderDeliveryNow`, `canOrderPickupNow`, а также `opensAt/closesAt/lastOrderAt/nextChangeAt` (ISO timestamps в UTC) + `timezone` и `serverTime`.
 - Дополнительно возвращает `deliveryRules` с массивами правил для `courier` и `pickup` (из single type `delivery-setting`).
+- Дополнительно возвращает `deliveryTime`:
+  - `windowMinutes`, `stepMinutes`, `minLeadMinutes`, `prepTimeMinutes`
+  - `slots`: массив `{ start, end }` (UTC ISO), только на текущий интервал; если `canOrderDeliveryNow=false`, слоты пустые.
 - Планируется вернуть `cutlery` (настройки приборов) для клиентов.
 - Защита на сервере:
   - `POST /api/orders` проверяет статус и вернёт ошибку, если сейчас нельзя принимать заказы:
